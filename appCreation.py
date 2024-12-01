@@ -49,7 +49,7 @@ class BudgetApp(QMainWindow):
 
         self.setWindowTitle("Budget Calculator")
 
-        self.Version = 1.0
+        self.Version = 2.0
         self.Author = "NIW"
 
         self.winWidth = 800
@@ -137,16 +137,17 @@ class BudgetApp(QMainWindow):
         return self.spreadsheet
     
     def handleFileDroppedVenmo(self,fpath):
+        # No longer venmo paying for wifi -- moved to BofA tools
         vsum = venmoTools_v2.venmoCompute(fpath)
-        wifiCost = venmoTools_v2.getWifi(fpath)
         Spreadsheet.modifyField(self.spreadsheet,'Venmo Bofa Net',-vsum)
-        Spreadsheet.modifyField(self.spreadsheet,'Wifi',wifiCost)
 
     def handleFileDroppedBofa(self,fpath):
         eversourceTotal = bofaTools.getEversource(fpath)
         travelersTotal = bofaTools.getTravelers(fpath)
+        wifiCost = bofaTools.getAstound(fpath)
         Spreadsheet.modifyField(self.spreadsheet,'Utilities (Gas/Elect)',-eversourceTotal)
         Spreadsheet.modifyField(self.spreadsheet,'Car Insurance',-travelersTotal)
+        Spreadsheet.modifyField(self.spreadsheet,'Wifi',wifiCost)
 
     def handleFileDroppedCapitalOne(self,fpath):
         cardNum = capitalOneTools.getCardNumber(fpath)
@@ -308,7 +309,7 @@ class Spreadsheet(QWidget):
         layout.addWidget(self.table_widget)
         
         self.data = {
-            "Rent": "1550",
+            "Rent": "1625",
             "Utilities (Gas/Elect)": "0",
             "Wifi": "0",
             "Groceries": "0",
@@ -356,17 +357,21 @@ class Spreadsheet(QWidget):
 
     def save_to_csv(self):
         file_path, _ = QFileDialog.getSaveFileName(self, "Save CSV", "C:/Users/nwinn/Desktop/"+'BudgetCosts_'+str(datetime.date.today()).replace(' ',''), "CSV Files (*.csv)")
-        with open(file_path, 'w', newline='') as file:
-            writer = csv.writer(file)
-            for row in range(self.table_widget.rowCount()):
-                row_data = []
-                for column in range(self.table_widget.columnCount()):
-                    item = self.table_widget.item(row, column)
-                    if item is not None:
-                        row_data.append(item.text())
-                    else:
-                        row_data.append("")
-                writer.writerow(row_data)
+        try:
+            with open(file_path, 'w', newline='') as file:
+                writer = csv.writer(file)
+                for row in range(self.table_widget.rowCount()):
+                    row_data = []
+                    for column in range(self.table_widget.columnCount()):
+                        item = self.table_widget.item(row, column)
+                        if item is not None:
+                            row_data.append(item.text())
+                        else:
+                            row_data.append("")
+                    writer.writerow(row_data)
+        except:
+            pass
+        
 
     def copy_selected_data(self):
         clipboard = QApplication.clipboard()

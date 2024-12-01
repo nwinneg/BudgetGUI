@@ -45,3 +45,19 @@ def getTravelers(fpath):
     myCost = sum(cCost)
 
     return myCost
+
+def getAstound(fpath):
+    data = pd.read_csv(fpath,skiprows=6)
+
+    # Get RCN Specific rows
+    desc = data.Description
+    test = np.array(desc.str.find('RCN') + 1,dtype=bool)
+    cData = data.iloc[test,:]
+
+    cCost = np.array(cData.Amount,dtype='float')
+
+    myCost = -sum(cCost)
+
+    return myCost
+
+
