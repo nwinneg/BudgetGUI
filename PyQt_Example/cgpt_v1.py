@@ -1,4 +1,5 @@
 import sys
+from PyQt6 import QtCore
 from PyQt6.QtCore import Qt, QMimeData
 from PyQt6.QtGui import QDragEnterEvent, QDropEvent
 from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QLabel, QWidget, QGridLayout
@@ -12,11 +13,13 @@ class MainWindow(QMainWindow):
 
         self.setWindowTitle("Budget Parser")
         self.resize(600, 600)
+        
+        self.setGeometry()
 
         # Create a central widget and layout
         central_widget = QWidget(self)
-        # layout = QVBoxLayout(central_widget)
-        layout = QGridLayout(central_widget)
+        layout = QVBoxLayout(central_widget)
+        # layout = QGridLayout(central_widget)
 
         # Create Widget Title
         self.create_title_label(layout)
@@ -42,8 +45,9 @@ class MainWindow(QMainWindow):
         title = 'Budget Parser v{}'.format(self.version)
         # label = QLabel("<h1><U>{}</U></h1>".format(title))
         label = QLabel("<h1>{}</h1>".format(title))
-        layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
-        layout.addWidget(label)
+        # layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        # layout.setAlignment(Qt.AlignLeft)
+        layout.addWidget(label,alignment=Qt.Alignment.AlignCenter) # Do alignment in add widget
 
     def create_drop_field(self, layout, annotation, file_types):
         """
@@ -58,9 +62,10 @@ class MainWindow(QMainWindow):
             None
         """
         label = QLabel(annotation, self)
-        label.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        # label.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        # label.setAlignment(Qt.AlignLeft)
         layout.addWidget(label)
-
+        
         # Create a custom drop area widget for each field
         drop_area = DropArea(file_types, self)
         layout.addWidget(drop_area)

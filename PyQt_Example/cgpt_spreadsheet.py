@@ -31,6 +31,7 @@ class SpreadsheetWindow(QMainWindow):
         # Centered title label
         title_label = QLabel("Spreadsheet")
         title_label.setObjectName("titleLabel")
+        # layout.addWidget(title_label, 0, 0, 1, 3, alignment=Qt.AlignmentFlag.AlignHCenter)
         layout.addWidget(title_label, 0, 0, 1, 3, alignment=Qt.AlignmentFlag.AlignHCenter)
 
         # Buttons on the left
@@ -82,4 +83,5 @@ class SpreadsheetWindow(QMainWindow):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = SpreadsheetWindow()
+    mainWindow.show()
     sys.exit(app.exec())
