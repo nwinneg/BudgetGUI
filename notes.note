@@ -2,3 +2,7 @@
 This is where pyinstaller lives ...
 
 C:\Users\nwinn\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.8_qbz5n2kfra8p0\LocalCache\local-packages\Python38\Scripts
+
+# Creating subclass files for popular objects
+- Need to have a layout for each of the widgets
+- The basis for PyQt stuff seems to be layering layouts ... can't forget those
