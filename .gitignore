@@ -1,0 +1,3 @@
+*.exe   # exes can be generated from release branch commits
+*.pyc   # Ignore pycache files
+*.note  # My notes that don't need to make it onto github

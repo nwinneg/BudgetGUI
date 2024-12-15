@@ -18,7 +18,7 @@ def computeCosts(fpath):
     auto = np.array([])
     misc = np.array([])
     for nn in range(numTrans):
-        r = data.iloc[nn,:]
+        r = data.iloc[nn,:] 
         # Groceries: Trader joes comes up as merch
         if ('TRADER' in r.Description) or ('Grocery' in r.Category) or ('WEGMANS' in r.Description):
             grocery = np.append(grocery,nn)
@@ -38,7 +38,7 @@ def computeCosts(fpath):
         else:
             misc = np.append(misc,nn)
 
-    data = {
+    dataOrganized = {
         "Groceries": sum(data.iloc[grocery,:].Debit),
         "Merchandise": sum(data.iloc[merch,:].Debit.iloc[np.array(np.invert(np.isnan(data.iloc[merch,:].Debit)),dtype='bool')]),
         "Dining Out": sum(data.iloc[dining,:].Debit.iloc[np.array(np.invert(np.isnan(data.iloc[dining,:].Debit)),dtype='bool')]),
@@ -46,7 +46,7 @@ def computeCosts(fpath):
         "Other": sum(data.iloc[misc,:].Debit.iloc[np.array(np.invert(np.isnan(data.iloc[misc,:].Debit)),dtype='bool')]),
     }
 
-    return data
+    return dataOrganized
         
 def getSpotify(fpath):
     # fpath = basePath+year+'/'+month+'/'+card+'_'+month.lower()+year[2:len(year)]+'.csv'
