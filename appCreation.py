@@ -47,7 +47,7 @@ class BudgetApp(QMainWindow):
         super().__init__()
         self.mainWindow = QMainWindow
 
-        self.setWindowTitle("Budget Calculator")
+        self.setWindowTitle("ClariFi")
 
         self.Version = 2.0
         self.Author = "NIW"
@@ -120,7 +120,7 @@ class BudgetApp(QMainWindow):
 
     def createTitleField(self,layout):
         # Add title to top layout
-        titleLabel = QLabel("<h1><i>Budget Manager</i></h1>")
+        titleLabel = QLabel("<h1><i><u>ClariFi<u></i></h1>")
         layout.addWidget(titleLabel,alignment=Qt.Alignment.AlignHCenter)
 
     def createDropField(self,fieldName,colorFlag,layout):
