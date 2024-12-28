@@ -1,5 +1,6 @@
 import sys
 import Spreadsheet
+import numpy as np
 # from PyQt6.QtCore import (
 #     Qt,
 #     pyqtSignal,
@@ -24,7 +25,6 @@ from PyQt6.QtWidgets import (
     QFormLayout,
     QSpacerItem
 )
-# import pandas as pd
 
 class SpreadsheetTestWindow(QMainWindow):
     def __init__(self):
@@ -40,14 +40,15 @@ class SpreadsheetTestWindow(QMainWindow):
 
         centralWidget = QWidget()
         self.setCentralWidget(centralWidget)
-        topLvlLayout = QHBoxLayout(centralWidget)
+        topLvlLayout = QVBoxLayout(centralWidget)
         
         # Set up the spreadsheet
         mySpreadsheet = Spreadsheet.Spreadsheet(self.winWidth,self.winHeight)
-        mySpreadsheet.setSheetSize(1, 1, 50, 50)
-        sheetSizeInit = [4, 3]
-        sheetTitles = ["title1", "title2", "title3"]
-        mySpreadsheet.setSheetParams(size=sheetSizeInit, titles=sheetTitles)
+        sheetTitles = ["Catagory", "Expense"]
+        colLabels = np.array(["Rent","Utilities (Gas/Elect)", "Wifi", "Groceries","Merchandise",
+            "Dining Out","Rental Insurance","Rent Deposits","Gas/Auto","Car Insurance",
+            "Spotify","Venmo Bofa Net","Healthcare","Other","Total"])
+        mySpreadsheet.setSheetParams(size=[14, 2], titles=sheetTitles, sizePct=[.75,.3], dataLabels=colLabels)
         topLvlLayout.addWidget(mySpreadsheet)
         
 if __name__ == "__main__":
