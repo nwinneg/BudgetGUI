@@ -1,5 +1,7 @@
 import sys
 import Spreadsheet
+import DataControlBar
+import PieChartWidget
 import numpy as np
 
 from PyQt6.QtCore import Qt
@@ -50,6 +52,7 @@ class SpreadsheetTestWindow(QMainWindow):
 
         # Create the middle layout
         midLayout = QHBoxLayout()
+        midLeftLayout = QVBoxLayout()
    
         # Set up the spreadsheets 
         costSheet = Spreadsheet.Spreadsheet(self.winWidth,self.winHeight)
@@ -58,11 +61,25 @@ class SpreadsheetTestWindow(QMainWindow):
         colLabels = np.array(["Rent","Utilities (Gas/Elect)", "Wifi", "Groceries","Merchandise",
             "Dining Out","Rental Insurance","Rent Deposits","Gas/Auto","Car Insurance",
             "Spotify","Venmo Bofa Net","Healthcare","Other","Total"])
-        costSheet.setSheetParams(size=[14, 2], titles=["Catagory","Expense"], sizePct=[.85,.3], dataLabels=colLabels,sizeColsOnContent=[0])
+        costSheet.setSheetParams(size=[15, 2], titles=["Catagory","Expense"], sizePct=[.85,.3], dataLabels=colLabels,sizeColsOnContent=[0])
         fileSheet.setSheetParams(size=[1, 3], titles=["FilePath","Account","Delete"], sizePct=[.25,.65], sizeColsOnContent=[1,2])
 
+        # Set up data control bar
+        dataControlBar = DataControlBar.DataControlBar(fileSheet)
+
+        # Set up Pie Chart
+        pieChart = PieChartWidget.PieChartWidget(costSheet)
+
         # Add the sheets to the middle layout
-        midLayout.addWidget(fileSheet,alignment=Qt.Alignment.AlignTop)
+        midLeftLayout.addWidget(fileSheet,alignment=Qt.Alignment.AlignTop)
+        midLeftLayout.addWidget(dataControlBar)
+        midLeftLayout.addWidget(pieChart)
+
+        # Add some other stuff
+        midLeftWidget = QWidget()
+        midLeftWidget.setLayout(midLeftLayout)
+
+        midLayout.addWidget(midLeftWidget,alignment=Qt.Alignment.AlignTop)
         midLayout.addWidget(costSheet,alignment=Qt.Alignment.AlignRight)
 
         # Create a middle widget to store all of that 

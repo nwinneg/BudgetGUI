@@ -1,4 +1,5 @@
 import os
+import DataFunctions
 
 from PyQt6.QtCore import Qt
 
@@ -30,6 +31,9 @@ class Spreadsheet(QWidget):
         # Store the window size
         self.winWidth = winWidth
         self.winHeight = winHeight
+
+        # Store a list of file paths that correspond to the table
+        self.filePaths = []
 
         # Set it up to accept files if desired (defaults to false)
         self.setAcceptDrops(acceptDrops)
@@ -78,10 +82,9 @@ class Spreadsheet(QWidget):
  
         # Populate the table with empty strings
         for row in range(sz[0]):
-            # self.table_widget.setRowHeight(row,rowHeight)
+
             self.table_widget.resizeRowToContents(row)
-            # print(row)
-            # header.setSectionResizeMode(row,QHeaderView.Stretch)
+
             for col in range(sz[1]):
                 if addLabels & (onlyOneRow) & (col == 0):
                     item = QTableWidgetItem(dataLabels[row])
@@ -89,7 +92,6 @@ class Spreadsheet(QWidget):
                     item = QTableWidgetItem(dataLabels[row,col])
                 else:
                     item = QTableWidgetItem("")
-                # self.table_widget.resizeColumnToContents(col)
 
                 self.table_widget.setItem(row, col, item)
                 self.table_widget.setColumnWidth(col,colWidth)
@@ -99,18 +101,15 @@ class Spreadsheet(QWidget):
             
             listToShrink = kwargs['sizeColsOnContent']
             listToGrow = [item for item in range(sz[1]) if item not in listToShrink]
-
-            print('Shrink: {}, Grow: {}'.format(len(listToShrink),len(listToGrow)))
             
             for col in kwargs['sizeColsOnContent']:
                 self.table_widget.resizeColumnToContents(col)
 
             if len(listToGrow) > 0:
-                maxWidth = self.table_widget.width()
+                # maxWidth = self.table_widget.width()
                 header = self.table_widget.horizontalHeader()
-                remainingWidth = maxWidth- sum([header.sectionSize(i) for i in listToShrink])
-                print(maxWidth)
-                nRemainingCols = len(listToGrow)
+                # remainingWidth = maxWidth- sum([header.sectionSize(i) for i in listToShrink])
+                # nRemainingCols = len(listToGrow)
 
                 for col in listToGrow:
                     header.setSectionResizeMode(col,QHeaderView.ResizeMode.Stretch)
@@ -119,7 +118,9 @@ class Spreadsheet(QWidget):
         self.table_widget.setMaximumWidth(self.winWidth * sizePct[1])
         self.table_widget.setMaximumHeight(self.winHeight * sizePct[0])
 
-        self.deleteRow(0)
+        # Delete the first row on init
+        if self.table_widget.columnCount() > 2:
+            self.deleteRow(0,True)
 
     def addRow(self):
         row_position = self.table_widget.rowCount()  # Get the current row count
@@ -138,11 +139,13 @@ class Spreadsheet(QWidget):
         #TODO: This will be easier
         pass
 
-    def deleteRow(self,rowIndex):
+    def deleteRow(self,rowIndex,isInit=False):
         if rowIndex >= self.table_widget.rowCount():
             return
         self.table_widget.removeRow(rowIndex)
         
+        if (not isInit):
+            del self.filePaths[rowIndex]
 
     def get_column_header(self, col: int) -> str:
         """Returns the header label for the given column index."""
@@ -163,11 +166,16 @@ class Spreadsheet(QWidget):
 
         for url in file_urls:
             file_path = url.toLocalFile()  # Convert URL to file path
-            if os.path.isfile(file_path):  # Check if it's a valid file
+            if os.path.isfile(file_path) & url.toLocalFile().lower().endswith(".csv"):  # Check if it's a valid file (CSV Only for now)
                 if self.table_widget.item(1,0) != "":
                     self.addRow()
                 rowPos = self.table_widget.rowCount()-1
-                self.table_widget.setItem(rowPos, 0, QTableWidgetItem("File: {}".format(file_path)))
+                filename = file_path.split("/")
+                filename = filename[-1]
+                self.filePaths.append(file_path)
+                cardType = DataFunctions.getAccountType(file_path)
+                self.table_widget.setItem(rowPos, 0, QTableWidgetItem("File: {}".format(filename)))
+                self.table_widget.setItem(rowPos,1,QTableWidgetItem(cardType))
 
     def on_cell_clicked(self,row,col):
         # Check whether to act at all
