@@ -14,7 +14,7 @@ def getSummary(fpath):
     hdata = pd.read_csv(fpath,skiprows=1,nrows=4,header=None)
     return hdata.iloc[:,[0,2]]
 
-def getEversource(fpath):
+def getEversource(fpath,month):
     # fpath = basePath+year+'/'+month+'/'+'BOFA'+'_'+month.lower()+year[2:len(year)]+'.csv'
 
     data = pd.read_csv(fpath,skiprows=6)
