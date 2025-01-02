@@ -1,6 +1,9 @@
 import pandas as pd
 import numpy as np
 from matplotlib import pyplot as plt
+import bofaTools
+import capitalOneTools
+import venmoTools_v2
 
 def getAccountType(fpath): # Read the file to check what kind of file this is
     # Read in the csv file
@@ -30,4 +33,74 @@ def getAccountType(fpath): # Read the file to check what kind of file this is
     
     # If we've gotten to here, it's chase [For Now]
     return "Sapphire"
+
+def getAvailableMonths(fpath,cardType):
+
+    if cardType == "BofA":
+        df = pd.read_csv(fpath,skiprows=6)
+    elif cardType == "Venmo":
+        df = pd.read_csv(fpath,skiprows=2)
+    else:
+        df = pd.read_csv(fpath)
     
+    if cardType == "Venmo":
+        datetimes = pd.to_datetime(df["Datetime"].dropna())
+        datetimes = datetimes.dt.strftime('%b-%y')
+        return datetimes.iloc[0]
+    elif cardType == "BofA":
+        dates = pd.to_datetime(df["Date"])
+        dates = dates.dt.strftime('%b-%y')
+        return list(dates.unique())
+    elif (cardType == "Savor") or (cardType == "Journey"):
+        dates = pd.to_datetime(df["Transaction Date"])
+        dates = dates.dt.strftime('%b-%y')
+        return list(dates.unique())
+    elif (cardType == "Sapphire"):
+        dates = pd.to_datetime(df["Transaction Date"])
+        dates = dates.dt.strftime('%b-%y')
+        return list(dates.unique())
+    
+def calculateCosts(fileList,cardTypes,month,costSheet,transactionSheet):
+    # Function does the following: 
+    #   Loops through files
+    #   Calculates costs and adds them to the cost sheet
+    #   Builds a complete list of transactions in selected month and populates the table
+    
+    transTable = pd.DataFrame(columns=["Account","Description","Date","Cost"])
+
+    for ff in range(len(fileList)):
+        fpath = fileList[ff]
+        cardType = cardTypes[ff]
+
+        if cardType == "BofA":
+            pass
+        elif cardType == "Venmo":
+            # Get the data
+            data = venmoTools_v2.getVenmoData(fpath,month)
+            if data is None:
+                continue
+            data["Account"] = "Venmo"
+            rentCost = venmoTools_v2.getRentVenmo(fpath)
+            vNet = venmoTools_v2.venmoCompute(fpath,month)
+            
+            # Populate cost sheet
+            costSheet.data["Rent"]= str(-rentCost)
+            costSheet.data["Venmo Bofa Net"] = str(-vNet)
+            costSheet.updateTotal()
+            costSheet.setData()
+
+            # fdata = venmoTools_v2.venmoData(fpath)
+            # print(rentCost)
+            # print(fdata)
+        elif cardType == "Savor":
+            pass
+        elif cardType == "Journey":
+            pass
+        elif cardType == "Sapphire":
+            pass
+            
+        transTable = pd.concat([transTable,data],ignore_index=True)
+        transactionSheet.updateSheet(transTable.sort_values(by='Date'))
+
+
+            

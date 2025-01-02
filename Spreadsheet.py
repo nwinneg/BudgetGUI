@@ -1,5 +1,6 @@
 import os
 import DataFunctions
+import numpy as np
 
 from PyQt6.QtCore import Qt
 
@@ -21,8 +22,8 @@ from PyQt6.QtWidgets import (
 #   Create a spreadsheet object by calling Spreadsheet(winWidth,winHeight)
 #   Use the member function to set the size and 
 
-class Spreadsheet(QWidget):
-    def __init__(self, winWidth, winHeight,acceptDrops=False,acceptClicks=False):
+class FileSpreadsheet(QWidget):
+    def __init__(self, winWidth, winHeight):
         super().__init__()
 
         # Generalized Spreadsheet Class
@@ -36,8 +37,8 @@ class Spreadsheet(QWidget):
         self.filePaths = []
 
         # Set it up to accept files if desired (defaults to false)
-        self.setAcceptDrops(acceptDrops)
-        self.acceptClicks = acceptClicks
+        self.setAcceptDrops(True)
+        self.acceptClicks = True
 
         # Set it up to handle delete click event
         self.table_widget.cellClicked.connect(self.on_cell_clicked)
@@ -113,7 +114,6 @@ class Spreadsheet(QWidget):
 
                 for col in listToGrow:
                     header.setSectionResizeMode(col,QHeaderView.ResizeMode.Stretch)
-                
 
         self.table_widget.setMaximumWidth(self.winWidth * sizePct[1])
         self.table_widget.setMaximumHeight(self.winHeight * sizePct[0])
@@ -176,6 +176,7 @@ class Spreadsheet(QWidget):
                 cardType = DataFunctions.getAccountType(file_path)
                 self.table_widget.setItem(rowPos, 0, QTableWidgetItem("File: {}".format(filename)))
                 self.table_widget.setItem(rowPos,1,QTableWidgetItem(cardType))
+                
 
     def on_cell_clicked(self,row,col):
         # Check whether to act at all
@@ -187,3 +188,169 @@ class Spreadsheet(QWidget):
 
         if hdr == "Delete":
             self.deleteRow(row)
+
+class CostSpreadsheet(QWidget):
+    def __init__(self,winWidth,winHeight):
+        super().__init__()
+
+        self.table_widget = QTableWidget()
+
+        # Store the window size
+        self.winWidth = winWidth
+        self.winHeight = winHeight
+
+        self.data = {"Rent":"0",
+                     "Utilities (Gas/Elect)":"0",
+                     "Wifi":"0",
+                      "Groceries":"0",
+                      "Merchandise":"0",
+                      "Dining Out":"0",
+                      "Rental Insurance":"0",
+                      "Rent Deposits":"0",
+                      "Gas/Auto":"0",
+                      "Car Insurance":"0",
+                      "Spotify":"0",
+                      "Venmo Bofa Net":"0",
+                      "Healthcare":"0",
+                      "Other":"0",
+                      "Total":"0"}
+                
+        self.colHeaders = ["Catagory","Total Cost"]
+
+        self.table_widget.setRowCount(len(self.data))
+        self.table_widget.setColumnCount(len(self.colHeaders))
+        
+        self.initializeTable()
+
+        self.table_widget.setMinimumHeight(self.winHeight*0.75)
+        # self.table_widget.setMinimumWidth(self.winWidth*.1)
+        # self.table_widget.resizeColumnsToContents()
+
+        layout = QVBoxLayout()
+        layout.addWidget(self.table_widget,alignment=Qt.Alignment.AlignTop)
+        self.setLayout(layout)
+
+        # Initialize the table
+
+    def initializeTable(self):
+
+        # Set the headers
+        self.table_widget.setHorizontalHeaderLabels(self.colHeaders)
+        header = self.table_widget.horizontalHeader()
+        bold_font = header.font()
+        bold_font.setBold(True)
+        header.setFont(bold_font)
+
+        # Disable row numbers
+        self.table_widget.verticalHeader().setVisible(False)
+
+        # Init table size
+        self.table_widget.setRowCount(len(self.data))
+        self.table_widget.setColumnCount(len(self.colHeaders))
+
+        # Populate with initial data
+        self.setData()
+
+    def setData(self):
+        rowCount = len(self.data)
+
+        # Update the table
+        header = self.table_widget.horizontalHeader()
+        row = 0
+        for field,value in self.data.items():
+            
+            field_item = QTableWidgetItem(field)
+            field_item.setTextAlignment(Qt.Alignment.AlignCenter)
+
+            value_item = QTableWidgetItem(value)
+            value_item.setTextAlignment(Qt.Alignment.AlignCenter)
+
+            self.table_widget.setItem(row, 0, field_item)
+            self.table_widget.setItem(row, 1, value_item)
+
+            self.table_widget.resizeRowToContents(row)
+
+            self.table_widget.resizeColumnToContents(0)
+            self.table_widget.resizeColumnToContents(1)
+
+            self.table_widget.setColumnWidth(0, max(self.table_widget.columnWidth(0),header.sectionSize(0)))
+            self.table_widget.setColumnWidth(1, max(self.table_widget.columnWidth(1),header.sectionSize(1)))
+
+            row += 1
+
+        # Resize the table to be the width of the columns
+        tabWidth = self.table_widget.columnWidth(0) + self.table_widget.columnWidth(1) + 2
+        if self.table_widget.verticalScrollBar().isVisible():
+            tabWidth += self.table_widget.verticalScrollBar().width()
+        self.table_widget.setFixedWidth(tabWidth)
+        
+    def updateTotal(self):
+        # Update the total
+        keys = list(self.data.keys())
+        tsum = 0
+        for key in keys:
+            if key == "Total":
+                continue
+            tsum += float(self.data[key])
+        self.data["Total"] = str(tsum)
+        
+    def resetTable(self):
+        self.data = {"Rent":"0",
+                     "Utilities (Gas/Elect)":"0",
+                     "Wifi":"0",
+                      "Groceries":"0",
+                      "Merchandise":"0",
+                      "Dining Out":"0",
+                      "Rental Insurance":"0",
+                      "Rent Deposits":"0",
+                      "Gas/Auto":"0",
+                      "Car Insurance":"0",
+                      "Spotify":"0",
+                      "Venmo Bofa Net":"0",
+                      "Healthcare":"0",
+                      "Other":"0",
+                      "Total":"0"}
+        
+        self.initializeTable()
+
+class TransactionSheet(QWidget):
+    def __init__(self,winWidth,winHeight):
+        super().__init__()
+
+        self.table_widget = QTableWidget()
+
+        self.winWidth = winWidth
+        self.winHeight = winHeight
+
+        self.colHeaders = ["Account","Description","Date","Cost"]
+        self.colsToShrink = [0,2,3] # Resize these columns to content
+
+        self.table_widget.setColumnCount(len(self.colHeaders))
+
+        self.table_widget.setHorizontalHeaderLabels(self.colHeaders)
+        header = self.table_widget.horizontalHeader()
+        bold_font = header.font()
+        bold_font.setBold(True)
+        header.setFont(bold_font)
+
+        layout = QVBoxLayout()
+        layout.addWidget(self.table_widget)
+        self.setLayout(layout)
+    
+    def updateSheet(self,newSheet):
+        self.table_widget.setColumnCount(4)
+        self.table_widget.setRowCount(newSheet.shape[0])
+
+        for row in range(newSheet.shape[0]):
+            for col in range(newSheet.shape[1]):
+                item = QTableWidgetItem(str(newSheet.iat[row, col]))  # Convert cell to string
+                self.table_widget.setItem(row, col, item)
+                self.table_widget.resizeColumnToContents(col)
+                # if col == 1:
+                #     self.table_widget.resizeColumnToContents(col)
+                    
+
+
+
+
+        
