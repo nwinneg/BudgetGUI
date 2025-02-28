@@ -34,6 +34,9 @@ def computeCosts(fpath):
         # Don't count credit payments
         elif (np.isnan(r.Debit)):
             continue
+        elif ('Spotify' in r.Category):
+            # Don't count spotify, already got that
+            continue
         # Catch all for anything else
         else:
             misc = np.append(misc,nn)
@@ -60,6 +63,15 @@ def getSpotify(fpath):
     sData = gData.Debit.iloc[sIdx]
 
     return sum(sData)
+
+def getJourneyNet(fpath):
+    data = pd.read_csv(fpath)
+    debits = data.iloc[np.array(np.invert(np.isnan(data.Debit)),dtype='bool')]
+    spot = getSpotify(fpath)
+
+    tot = sum(debits.Debit) - spot
+    
+    return tot
 
 def getCardNumber(fpath):
     # Get the card number

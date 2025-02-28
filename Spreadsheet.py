@@ -188,6 +188,9 @@ class FileSpreadsheet(QWidget):
 
         if hdr == "Delete":
             self.deleteRow(row)
+    
+    def resetSheet(self):
+        print("TODO: RESET FILE SHEET")
 
 class CostSpreadsheet(QWidget):
     def __init__(self,winWidth,winHeight):
@@ -348,6 +351,8 @@ class TransactionSheet(QWidget):
                 self.table_widget.resizeColumnToContents(col)
                 # if col == 1:
                 #     self.table_widget.resizeColumnToContents(col)
+    def resetSheet(self):
+        print("TODO: RESET TRANSACTION SHEET")
                     
 
 

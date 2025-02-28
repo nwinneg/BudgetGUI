@@ -142,6 +142,9 @@ class AppControlBar(QWidget):
 
     def resetApp(self):
         print("TODO: RESET")
+        self.costSheet.resetTable()
+        self.fileSheet.resetSheet()
+        self.transactionSheet.resetSheet()
 
     def copySelected(self):
         print("TODO: COPY")

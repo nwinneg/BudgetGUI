@@ -95,12 +95,31 @@ def calculateCosts(fileList,cardTypes,month,costSheet,transactionSheet):
         elif cardType == "Savor":
             pass
         elif cardType == "Journey":
-            pass
+            # Get spotify
+            spotifyCost = capitalOneTools.getSpotify(fpath)
+            costSheet.data["Spotify"] = str(spotifyCost)
+
+            # Get additional
+            data = capitalOneTools.computeCosts(fpath)
+
+            # TODO: Function to make transaction table
+            
+
+            # Add to table
+            print('Spotify {}'.format(spotifyCost))
+            print(data)
+            # print(data['Groceries'])
+            # print(data['Merchandise'])
+            # print(data['Dining Out'])
+            # print(data['Gas/Auto'])
+            # print(data['Other'])
+
         elif cardType == "Sapphire":
             pass
             
-        transTable = pd.concat([transTable,data],ignore_index=True)
-        transactionSheet.updateSheet(transTable.sort_values(by='Date'))
+        
+        # transTable = pd.concat([transTable,data],ignore_index=True)
+        # transactionSheet.updateSheet(transTable.sort_values(by='Date'))
 
 
             
